@@ -65,6 +65,11 @@ function App() {
       }
 
       const options = {
+        plotOptions: {
+          series: {
+              animation: false
+          }
+        },
         series: [
           {
             type: "wordcloud",
