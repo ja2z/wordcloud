@@ -29,7 +29,6 @@ function App() {
   const options = useMemo(() => {
     const dimensions = config.dimension;
     const measures = config.measures;
-
     //transform sigmaData --> wordcloud data
     if (sigmaData?.[dimensions]) {
       let dataMap = [];
@@ -56,19 +55,34 @@ function App() {
         }
       }
 
-      // convert dataMap to array
+      function getTopNItems(dataMap, n = 10) { // Default TopN
+        if (!dataMap || typeof dataMap !== "object") {
+          throw new Error("Invalid dataMap provided");
+        }
+        if (n <= 0) {
+          throw new Error("N must be greater than 0");
+        }
+
+        return Object.entries(dataMap)
+          .map(([name, weight]) => ({ name, weight }))
+          .sort((a, b) => b.weight - a.weight)
+          .slice(0, n);
+      }
+
+      // convert dataMap to array and get topN so we don't overwhelm the word cloud
       let data = [];
-      let i = 0;
-      for (var key in dataMap) {
-        data[i] = { name: key, weight: dataMap[key] };
-        i++;
+
+      try {
+        data = getTopNItems(dataMap, 200); // TopN of 200 seems reasonable
+      } catch (error) {
+        console.error("Error:", error.message);
       }
 
       const options = {
         plotOptions: {
           series: {
-              animation: false
-          }
+            animation: false,
+          },
         },
         series: [
           {
