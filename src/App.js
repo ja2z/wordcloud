@@ -42,20 +42,30 @@ function App() {
         }
         // add text & weighting to dataMap, tokenize optional
         if (client.config.getKey("Tokenize y/n?") === "Y") {
-          const words = sw.removeStopwords(text.split(/[,. ]+/g));
-          for (let j = 0; j < words.length; j++) {
-            dataMap[words[j]] === undefined
-              ? (dataMap[words[j]] = weight)
-              : (dataMap[words[j]] += weight);
+          // Add null/undefined check for text
+          if (text) {
+            // This will check if text is not null/undefined
+            const words = sw.removeStopwords(text.split(/[,. ]+/g));
+            for (let j = 0; j < words.length; j++) {
+              dataMap[words[j]] === undefined
+                ? (dataMap[words[j]] = weight)
+                : (dataMap[words[j]] += weight);
+            }
+          } else {
+            console.warn("Text is null or undefined"); // Optional: add warning for debugging
           }
         } else {
-          dataMap[text] === undefined
-            ? (dataMap[text] = weight)
-            : (dataMap[text] += weight);
+          if (text) {
+            // Also add check here
+            dataMap[text] === undefined
+              ? (dataMap[text] = weight)
+              : (dataMap[text] += weight);
+          }
         }
       }
 
-      function getTopNItems(dataMap, n = 10) { // Default TopN
+      function getTopNItems(dataMap, n = 10) {
+        // Default TopN
         if (!dataMap || typeof dataMap !== "object") {
           throw new Error("Invalid dataMap provided");
         }
